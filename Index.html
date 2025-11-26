@@ -1,1 +1,116 @@
-<!--Tarea final- Arturo Molina y Valeria Saravia//prueba-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pizza Gorditos — Delivery</title>
+  <meta name="description" content="Ordena pizza a domicilio en Pizza Gorditos: rápido, claro y seguro." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="barra-superior">
+    <div class="contenedor fila-encabezado">
+      <button id="alternar-menu" class="icono-btn solo-movil" aria-label="Abrir menú" aria-expanded="false">☰</button>
+
+      <div class="marca">
+        <img id="logo-marca" class="marca-img" src="logos.png" alt="Logo Pizza Gorditos" />
+        <div class="logo" aria-hidden="true"></div>
+        <div class="marca-texto">
+          <strong>Pizza Gorditos</strong>
+          <span>Delivery</span>
+        </div>
+      </div>
+
+      <button id="abrir-carrito" class="icono-btn" aria-label="Abrir carrito">🛒</button>
+    </div>
+  </div>
+
+  <nav class="barra-menu" aria-label="Navegación principal">
+    <div class="contenedor barra-menu-interior">
+      <a href="#inicio">Inicio</a>
+      <a href="#menu">Menú</a>
+      <a href="#promos">Promociones</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+  </nav>
+
+  <div id="menu-telon" class="menu-telon" hidden></div>
+  <div id="menu-movil" class="menu-movil" hidden>
+    <a href="#inicio" class="enlace-movil">Inicio</a>
+    <a href="#menu" class="enlace-movil">Menú</a>
+    <a href="#promos" class="enlace-movil">Promociones</a>
+    <a href="#contacto" class="enlace-movil">Contacto</a>
+  </div>
+
+  <header id="inicio" class="hero hero-fondo-fijo" role="img" aria-label="Pizza recién horneada">
+    <div class="contenedor hero-rejilla">
+      <div class="hero-copia">
+        <h1>No es solamente pizza, <span class="acento">Es Una Experiencia</span></h1>
+        <p>Ordena online con nuestra cocina abierta y entrega rápida.</p>
+        <div class="hero-llamada">
+          <a class="btn primario" href="#menu">Ordenar ahora</a>
+          <div class="indicadores">
+            <span>2000+ Clientes</span>
+            <span>150+ Entregas/día</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="menu" class="seccion contenedor">
+      <div class="seccion-encabezado">
+        <h2>Descubre Nuestro Menú</h2>
+        <div class="fichas">
+          <button class="ficha activo" disabled>Pizzas</button>
+          <button class="ficha">Promociones</button>
+        </div>
+      </div>
+      <div id="rejilla-menu" class="menu-rejilla" aria-live="polite"></div>
+    </section>
+
+    <section id="pago-pedido" class="seccion contenedor">
+      <h2>Pagar pedido</h2>
+      <div class="disposicion-pago">
+        <aside class="carrito" aria-label="Carrito">
+          <header class="carrito-encabezado">
+            <strong>Carrito</strong>
+            <button id="vaciar-carrito" class="btn-texto">Vaciar</button>
+          </header>
+          <div id="lista-carrito" class="lista-carrito"></div>
+          <div id="carrito-vacio" class="carrito-vacio">Tu carrito está vacío</div>
+          <div class="totales">
+            <div class="fila"><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+            <div class="fila"><span>Descuento</span><strong id="descuento">$0.00</strong></div>
+            <div class="fila"><span>Envío</span><strong id="envio">$2.00</strong></div>
+            <div class="fila total"><span>Total</span><strong id="total">$0.00</strong></div>
+          </div>
+        </aside>
+
+        <form id="formulario-pedido" class="formulario" novalidate>
+          <div class="campo">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" required placeholder="Juan Pérez" />
+          </div>
+          <div class="campo">
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" name="telefono" type="tel"
+                   inputmode="numeric" maxlength="9"
+                   placeholder="1234-5678"
+                   pattern="^\d{4}-\d{4}$" required />
+          </div>
+          <div class="campo">
+            <label for="direccion">Dirección</label>
+            <input id="direccion" name="direccion" required placeholder="Colonia, calle, # casa" />
+          </div>
+          <div class="campo">
+            <label for="pago">Método de pago</label>
+            <select id="pago" name="pago">
+              <option value="contraentrega">Contraentrega</option>
+              <option value="online">En línea (10% off)</option>
+            </select>
+          </div>
