@@ -172,3 +172,177 @@ function renderizarCarrito(){
   $('#envio').textContent=formatoDinero(envio);
   $('#total').textContent=formatoDinero(total);
 }
+/* ===== Pagar pedido + Pago en línea ===== */
+function validarFormulario(){
+  for(const id of ['nombre','telefono','direccion']){
+    const el = document.getElementById(id);
+    if(!el.checkValidity()) return false;
+  }
+  return estado.carrito.length>0;
+}
+function enviarPedido(e){
+  e.preventDefault();
+  const estadoFormulario=$('#estado-formulario');
+  if(!validarFormulario()){
+    estadoFormulario.textContent='Completa los campos y agrega productos.'; estadoFormulario.style.color='#ffb4b4'; return;
+  }
+  if($('#pago').value==='online'){ abrirHojaPago(); }
+  else{ realizarPedido(); }
+}
+function realizarPedido(){
+  const totales=calcular();
+  const pedido={
+    id:`PG-${Date.now().toString().slice(-6)}`,
+    at:new Date().toISOString(),
+    cliente:{nombre:$('#nombre').value.trim(), telefono:$('#telefono').value.trim(), direccion:$('#direccion').value.trim()},
+    pago:$('#pago').value,
+    ...totales, paso:0
+  };
+  if(pedido.pago==='online'){
+    const dlg=document.getElementById('modal-pago'), texto=document.getElementById('texto-pago');
+    dlg.showModal(); texto.textContent='Procesando pago…';
+    setTimeout(()=>{ texto.textContent='Pago aprobado ✔'; setTimeout(()=>{ dlg.close(); finalizarPedido(pedido,$('#estado-formulario')); },700); },1200);
+  }else{
+    finalizarPedido(pedido,$('#estado-formulario'));
+  }
+}
+function finalizarPedido(pedido,elEstado){
+  estado.ultimoPedido=pedido; guardar('pg_pedido',estado.ultimoPedido);
+  vaciarCarrito();
+  elEstado.textContent='Pedido confirmado. Revisa el estado abajo.'; elEstado.style.color='#9CC645';
+  location.hash='#estado'; renderizarEstado();
+}
+
+/* ===== Pantalla de pago ===== */
+function abrirHojaPago(){
+  const hoja = document.getElementById('hoja-pago');
+  const btnCerrar = document.getElementById('cerrar-pago');
+  const btnCancelar = document.getElementById('cancelar-pago');
+  const formulario = document.getElementById('formulario-pago');
+  const num = document.getElementById('numeroTarjeta');
+  const vencimiento = document.getElementById('vencimiento');
+
+  hoja.showModal();
+  const cerrar = ()=>hoja.close();
+  btnCerrar.onclick = btnCancelar.onclick = cerrar;
+
+  // Validación adicional de vencimiento
+  vencimiento.addEventListener('input', ()=>enmascararVencimiento(vencimiento));
+  vencimiento.addEventListener('blur', ()=>validarVencimientoNoPasado(vencimiento));
+
+  formulario.onsubmit = (ev)=>{
+    ev.preventDefault();
+
+    enmascararNumeroTarjeta(num); enmascararVencimiento(vencimiento);
+    const camposOk = ['nombreTarjeta','numeroTarjeta','vencimiento','cvv'].every(id => document.getElementById(id).checkValidity());
+    if(!camposOk || vencimiento.validationMessage){
+      formulario.reportValidity(); return;
+    }
+    cerrar();
+    realizarPedido();
+  };
+}
+
+/* ===== Estado + Mapa */
+let mapa,repartidor,marcadorDestino;
+const SUCURSAL=[13.6929,-89.2182]; // Sucursal
+const DESTINO={lat:13.7042, lng:-89.1081, label:'Bosques de la Paz, Ilopango · Calle 19 Poniente'};
+const POSICION_REPARTIDOR='pg_pos_repartidor';
+
+function asegurarMapa(){
+  if(mapa) return;
+  mapa=L.map('mapa',{zoomControl:true}).setView(SUCURSAL,13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapa);
+  L.marker(SUCURSAL).addTo(mapa).bindPopup('Pizza Gorditos (Sucursal)');
+  marcadorDestino = L.marker([DESTINO.lat, DESTINO.lng]).addTo(mapa).bindPopup(DESTINO.label);
+}
+function obtenerPosicionRepartidor(){ return cargar(POSICION_REPARTIDOR, null); }
+function establecerPosicionRepartidor(latlng){ guardar(POSICION_REPARTIDOR, latlng); }
+function eliminarPosicionRepartidor(){ eliminar(POSICION_REPARTIDOR); }
+
+function renderizarEstado(){
+  const sin=$('#sin-pedido'), info=$('#info-pedido');
+  if(!estado.ultimoPedido){ sin.classList.remove('ocultar'); info.classList.add('ocultar'); return; }
+  sin.classList.add('ocultar'); info.classList.remove('ocultar');
+
+  const o=estado.ultimoPedido;
+  $('#id-pedido').textContent=o.id;
+  const dir=o.cliente?.direccion ? ` · Envío a: ${o.cliente.direccion}` : '';
+  $('#resumen-pedido').textContent=o.items.map(i=>`${i.qty}× ${i.nombre} ${etiquetarTamano(i.size)}`).join(', ') + ` — Total ${formatoDinero(o.total)}${dir}`;
+
+  $$('.linea-tiempo .paso').forEach(el=>{ const s=Number(el.dataset.step); el.classList.toggle('activo', s<=o.paso); });
+
+  asegurarMapa();
+  const guardada = obtenerPosicionRepartidor();
+
+  if(!repartidor){
+    const latlngInicio = (o.paso<3 && guardada) ? guardada : SUCURSAL;
+    repartidor=L.marker(latlngInicio).addTo(mapa).bindPopup('Repartidor');
+  }else if(o.paso<3 && guardada){
+    repartidor.setLatLng(guardada);
+  }
+
+  mapa.fitBounds([SUCURSAL, [DESTINO.lat, DESTINO.lng]], { padding:[30,30] });
+
+  const eta=new Date(Date.now()+(40-o.paso*10)*60000);
+  $('#texto-eta').textContent=o.paso<3?`Estimado de entrega: ${eta.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`:'¡Entregado!';
+
+  if(o.paso>=2 && o.paso<3 && !guardada){
+    animarRepartidor(SUCURSAL, [DESTINO.lat, DESTINO.lng], 4000);
+  }
+}
+function animarRepartidor(de,a,ms){
+  const inicio=performance.now();
+  (function bucle(ahora){
+    const t=Math.min(1,(ahora-inicio)/ms);
+    const lat=de[0]+(a[0]-de[0])*t, lng=de[1]+(a[1]-de[1])*t;
+    const pos=[lat,lng];
+    repartidor.setLatLng(pos);
+    establecerPosicionRepartidor(pos);
+    if(t<1) requestAnimationFrame(bucle);
+  })(inicio);
+}
+function avanzarPaso(){
+  if(!estado.ultimoPedido) return;
+  if(estado.ultimoPedido.paso<3){
+    estado.ultimoPedido.paso += 1;
+    if(estado.ultimoPedido.paso===3){ eliminarPosicionRepartidor(); }
+    guardar('pg_pedido', estado.ultimoPedido);
+    renderizarEstado();
+  }
+}
+
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('anio').textContent=new Date().getFullYear();
+  configurarMenuMovil();
+
+  if(estado.ultimoPedido && estado.ultimoPedido.paso===3){ eliminar('pg_pedido'); eliminarPosicionRepartidor(); estado.ultimoPedido=null; }
+
+  
+  const telefono = document.getElementById('telefono');
+  telefono.addEventListener('input', ()=>enmascararTelefono(telefono));
+  telefono.addEventListener('paste', e=>{ e.preventDefault(); telefono.value = (e.clipboardData.getData('text')||''); enmascararTelefono(telefono); });
+
+  const tarjeta = document.getElementById('numeroTarjeta');
+  const vencimiento  = document.getElementById('vencimiento');
+  const cvv  = document.getElementById('cvv');
+  if(tarjeta){
+    tarjeta.addEventListener('input', ()=>enmascararNumeroTarjeta(tarjeta));
+    tarjeta.addEventListener('paste', e=>{ e.preventDefault(); tarjeta.value=(e.clipboardData.getData('text')||''); enmascararNumeroTarjeta(tarjeta); });
+  }
+  if(vencimiento){
+    vencimiento.addEventListener('input', ()=>enmascararVencimiento(vencimiento));
+    vencimiento.addEventListener('paste', e=>{ e.preventDefault(); vencimiento.value=(e.clipboardData.getData('text')||''); enmascararVencimiento(vencimiento); });
+  }
+  if(cvv){
+    cvv.addEventListener('input', ()=>{ cvv.value = cvv.value.replace(/\D/g,'').slice(0,4); });
+  }
+
+  renderizarMenu(); renderizarCarrito(); renderizarEstado();
+  $('#pago').addEventListener('change', renderizarCarrito);
+  $('#abrir-carrito').addEventListener('click', ()=>{ location.hash='#pago-pedido'; });
+  $('#vaciar-carrito').addEventListener('click', vaciarCarrito);
+  $('#formulario-pedido').addEventListener('submit', enviarPedido);
+  $('#avanzar').addEventListener('click', avanzarPaso);
+});
