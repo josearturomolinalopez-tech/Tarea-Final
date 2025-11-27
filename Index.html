@@ -114,3 +114,119 @@
               <option value="online">En línea (10% off)</option>
             </select>
           </div>
+<div class="acciones-formulario">
+            <button type="submit" class="btn primario">Confirmar pedido</button>
+            <p id="estado-formulario" class="estado-formulario" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="estado" class="seccion contenedor">
+      <h2>Estado del envío</h2>
+      <div id="tarjeta-estado" class="tarjeta-estado">
+        <div id="sin-pedido">Aún no hay pedidos. Agrega pizzas y confirma.</div>
+        <div id="info-pedido" class="ocultar">
+          <div class="pedido-encabezado">
+            <div>
+              <div class="pedido-id" id="id-pedido">—</div>
+              <p id="resumen-pedido"></p>
+            </div>
+            <button id="avanzar" class="btn">Simular avance</button>
+          </div>
+          <div class="linea-tiempo">
+            <div class="paso" data-step="0">Recibido</div>
+            <div class="paso" data-step="1">Preparando</div>
+            <div class="paso" data-step="2">En camino</div>
+            <div class="paso" data-step="3">Entregado</div>
+          </div>
+          <div id="mapa" class="mapa" role="img" aria-label="Mapa de entrega"></div>
+          <p class="apagado" id="texto-eta"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="promos" class="seccion contenedor">
+      <h2>Promociones</h2>
+      <div class="rejilla-promo">
+        <article class="tarjeta-promo">
+          <h3>🔥 2x1 Martes</h3>
+          <p>Llévate 2 pizzas medianas por el precio de 1. Aplica Margarita y Pepperoni.</p>
+          <small>Válido solo los martes. No acumulable.</small>
+        </article>
+        <article class="tarjeta-promo">
+          <h3>🍕 Familiar + Pepperoni pequeña</h3>
+          <p>Por cada <strong>2 pizzas familiares</strong> (cualquier especialidad) te regalamos <strong>1 Pepperoni personal</strong>. Se agrega automáticamente en el carrito.</p>
+          <small>Válido toda la semana.</small>
+        </article>
+      </div>
+    </section>
+
+    <section id="contacto" class="seccion contenedor">
+      <h2>Contacto</h2>
+      <p class="apagado">Sucursal central · Tel: <a href="tel:+50378220923">+503 7822 0923</a></p>
+    </section>
+  </main>
+
+  <footer class="pie-sitio">
+    <div class="contenedor">© <span id="anio"></span> Pizza Gorditos — Proyecto académico.</div>
+  </footer>
+
+  <dialog id="modal-pago">
+    <div class="modal">
+      <div class="girador" aria-hidden="true"></div>
+      <p id="texto-pago">Procesando pago…</p>
+    </div>
+  </dialog>
+
+  <dialog id="hoja-pago">
+    <form id="formulario-pago" method="dialog" class="hoja-pago" novalidate>
+      <header class="pago-encabezado">
+        <strong>Pago en línea</strong>
+        <button type="button" id="cerrar-pago" class="icono-btn">✕</button>
+      </header>
+      <div class="pago-cuerpo">
+        <div class="campo">
+          <label for="nombreTarjeta">Nombre en la tarjeta</label>
+          <input id="nombreTarjeta" autocomplete="cc-name" required placeholder="Como aparece en la tarjeta" />
+        </div>
+        <div class="campo">
+          <label for="numeroTarjeta">Número de tarjeta</label>
+          <input id="numeroTarjeta" inputmode="numeric" autocomplete="cc-number"
+                 maxlength="19" placeholder="1234 5678 9012 3456"
+                 pattern="^(\d{4} ?){3}\d{4}$" required />
+        </div>
+        <div class="pago-fila">
+          <div class="campo">
+            <label for="vencimiento">Vencimiento</label>
+            <input id="vencimiento" inputmode="numeric" autocomplete="cc-exp"
+                   maxlength="5" placeholder="MM/AA"
+                   pattern="^(0[1-9]|1[0-2])\/\d{2}$" required />
+          </div>
+          <div class="campo">
+            <label for="cvv">CVV</label>
+            <input id="cvv" inputmode="numeric" autocomplete="cc-csc"
+                   maxlength="4" placeholder="123" pattern="^\d{3,4}$" required />
+          </div>
+        </div>
+        <div class="campo">
+          <label for="metodo">Método</label>
+          <select id="metodo" autocomplete="cc-type">
+            <option>Visa</option>
+            <option>MasterCard</option>
+            <option>American Express</option>
+            <option>PayPal</option>
+          </select>
+        </div>
+      </div>
+      <footer class="pago-pie">
+        <button class="btn" type="button" id="cancelar-pago">Cancelar</button>
+        <button class="btn primario" type="submit" id="enviar-pago">Pagar ahora</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
