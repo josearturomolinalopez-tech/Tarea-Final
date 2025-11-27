@@ -70,3 +70,76 @@ a{color:inherit;text-decoration:none}
 /* Secciones */
 .seccion{padding:28px 0}
 .seccion-encabezado{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+.fichas{display:flex;gap:8px}
+.ficha{border:1px solid #3b3b3b;background:#262626;color:#d6d6d6;border-radius:999px;padding:8px 12px}
+.ficha.activo{background:#333;color:#fff}
+
+/* Rejilla Menu */
+.menu-rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:14px}
+.tarjeta{background:var(--panel);border:1px solid #2a2a2a;border-radius:var(--radio);padding:12px;box-shadow:var(--sombra);transition:transform .15s}
+.tarjeta:hover{transform:translateY(-2px)}
+.tarjeta h3{margin:8px 0 2px}
+.tarjeta p{margin:0 0 8px;color:#d0d0d0}
+.fila-tamano{display:flex;gap:8px;margin:8px 0}
+.fila-tamano button{flex:1;border:1px solid #3a3a3a;background:#242424;color:#fff;border-radius:10px;padding:8px}
+.fila-tamano button.activo{outline:2px solid var(--marca)}
+.tarjeta-pie{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.precio{font-weight:800}
+.btn-agregar{background:var(--marca);border:0;color:#fff;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer}
+
+/* Pagar */
+.disposicion-pago{display:grid;gap:16px}
+.carrito{background:var(--panel);border:1px solid #2a2a2a;border-radius:var(--radio);padding:12px}
+.carrito-encabezado{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.btn-texto{background:transparent;border:0;color:#ffb4b4;cursor:pointer}
+.lista-carrito{display:flex;flex-direction:column;gap:10px;max-height:320px;overflow:auto}
+.carrito-vacio{color:#d0d0d0;text-align:center;padding:12px}
+.linea{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center}
+.cantidad{display:flex;align-items:center;gap:6px}
+.cantidad button{width:28px;height:28px;border-radius:8px;background:#242424;border:1px solid #3a3a3a;color:#fff}
+.totales{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.fila{display:flex;align-items:center;justify-content:space-between;color:#d0d0d0}
+.fila.total{color:#fff;font-size:18px}
+.formulario{background:var(--panel);border:1px solid #2a2a2a;border-radius:var(--radio);padding:12px;display:grid;grid-template-columns:1fr;gap:12px}
+.campo{display:flex;flex-direction:column;gap:6px}
+label{color:#d0d0d0;font-size:13px}
+input,select,textarea{background:#242424;border:1px solid #3a3a3a;color:#fff;border-radius:12px;padding:10px;outline:none}
+.acciones-formulario{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.estado-formulario{color:#d0d0d0}
+
+/* Estado + Mapa */
+.tarjeta-estado{background:var(--panel);border:1px solid #2a2a2a;border-radius:var(--radio);padding:12px}
+.pedido-encabezado{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pedido-id{display:inline-block;background:#242424;border:1px solid #3a3a3a;color:#fff;padding:4px 10px;border-radius:999px;font-size:12px}
+.linea-tiempo{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.paso{border:1px dashed #3a3a3a;border-radius:12px;padding:10px;text-align:center;color:#d0d0d0}
+.paso.activo{border-style:solid;border-color:var(--ok);color:#ebffe2}
+.mapa{height:280px;border-radius:14px;overflow:hidden;border:1px solid #3a3a3a}
+.apagado{color:#d0d0d0}
+.ocultar{display:none !important}
+
+/* Promociones */
+.rejilla-promo{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.tarjeta-promo{background:var(--panel);border:1px solid #2a2a2a;border-radius:var(--radio);padding:14px;box-shadow:var(--sombra)}
+.tarjeta-promo h3{margin:0 0 6px}
+.tarjeta-promo p{margin:0 0 6px}
+.tarjeta-promo small{color:#d0d0d0}
+
+/* Modal "Procesando" */
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.modal{display:flex;align-items:center;gap:12px;padding:18px 22px;background:#1c1c1c;border:1px solid #3a3a3a;border-radius:14px;color:#fff}
+.girador{width:18px;height:18px;border-radius:50%;border:3px solid #5a5a5a;border-top-color:#fff;animation:girar .9s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+
+/* Pantalla de pago */
+#hoja-pago{border:0;padding:0;background:transparent}
+.hoja-pago{width:min(520px,92vw);background:#1b1b1b;border:1px solid #2a2a2a;border-radius:16px;overflow:hidden}
+.pago-encabezado{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #2a2a2a}
+.pago-cuerpo{padding:14px;display:grid;gap:12px}
+.pago-fila{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pago-pie{display:flex;justify-content:flex-end;gap:10px;padding:12px 14px;border-top:1px solid #2a2a2a}
+
+.pie-sitio{border-top:1px solid #2a2a2a;padding:16px 0;color:#d0d0d0;text-align:center}
+
+.logo{display:none !important;}
